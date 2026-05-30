@@ -13,6 +13,8 @@ class Tool extends Model
         'status',
         'attributes',
         'qr_code_path',
+        'seen_by_std',
+        'seen_by_emp',
     ];
 
     protected $casts = [

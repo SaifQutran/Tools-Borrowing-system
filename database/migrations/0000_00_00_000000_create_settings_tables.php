@@ -43,6 +43,7 @@ return new class extends Migration
         Schema::create('tool_types', function (Blueprint $table) {
             $table->id();
             $table->string('name'); // Arabic name (ميكروفون, جهاز عرض, etc.)
+            $table->String('shortcut');
             $table->timestamps();
         });
     }

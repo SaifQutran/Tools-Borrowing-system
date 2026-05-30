@@ -15,8 +15,25 @@
             <a href="{{ route('admin.tools.create') }}" class="btn btn-primary">إضافة أداة جديدة</a>
         </div>
 
+
+
         @if(session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>
+        @endif
+
+        @if($errors->any())
+            <div class="alert" style="background: #fee2e2; color: #991b1b; border: 1px solid #fecaca;">{{ $errors->first() }}</div>
+        @endif
+
+        @if(session('import_errors'))
+            <div class="alert" style="background: #fee2e2; color: #991b1b; border: 1px solid #fecaca;">
+                <strong>Rows skipped:</strong>
+                <ul style="margin: 0.5rem 0 0;">
+                    @foreach(session('import_errors') as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
         @endif
 
         <div class="card">
@@ -27,6 +44,7 @@
                             <th>الاسم</th>
                             <th>النوع</th>
                             <th>الكود</th>
+                            <th>ظاهرة لـ</th>
                             <th>الحالة</th>
                             <th>الإجراءات</th>
                         </tr>
@@ -38,6 +56,10 @@
                                 <td>{{ $tool->toolType->name }}</td>
                                 <td><code>{{ $tool->code }}</code></td>
                                 <td>
+
+                                    <livewire:tool-visibility :tool="$tool" wire:key="tool-visibility-{{ $tool->id }}" />
+                        </td>
+                                <td>
                                     @if($tool->status == 'available')
                                         <span class="badge badge-success">متاح</span>
                                     @else
@@ -46,7 +68,7 @@
                                 </td>
                                 <td>
                                     <a href="{{ route('admin.tools.edit', $tool) }}" class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.875rem; margin-left: 0.5rem;">تعديل</a>
-                                    <button onclick="showQR({{ $tool->id }}, '{{ $tool->name }}')" class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.875rem; margin-left: 0.5rem;">QR</button>
+                                    <button onclick='showQR({{ $tool->id }}, @json($tool->name), @json($tool->code))' class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.875rem; margin-left: 0.5rem;">QR</button>
                                     <form method="POST" action="{{ route('admin.tools.destroy', $tool) }}" style="display: inline;">
                                         @csrf
                                         @method('DELETE')
@@ -55,7 +77,7 @@
                                 </td>
                             </tr>
                         @empty
-                            <tr><td colspan="5" class="text-center">لا توجد أدوات</td></tr>
+                            <tr><td colspan="6" class="text-center">لا توجد أدوات</td></tr>
                         @endforelse
                     </tbody>
                 </table>
@@ -63,8 +85,13 @@
         </div>
 
         <div class="mt-3">{{ $tools->links() }}</div>
+        <form method="POST" action="{{ route('admin.tools.import') }}" enctype="multipart/form-data" style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap;">
+            @csrf
+            <input type="file" name="tools_file" accept=".xlsx,.csv" required class="form-control" style="max-width: 260px;">
+            <button type="submit" class="btn btn-secondary">استيراد Excel</button>
+            <a href="{{ route('admin.tools.import.template') }}" class="btn btn-primary">قالب excel</a>
+        </form>
     </div>
-
     <!-- QR Code Modal -->
     <div id="qrModal" class="modal">
         <div class="modal-content">
@@ -78,6 +105,10 @@
                     <p style="margin-top: 1rem; color: var(--gray-600);">جاري إنشاء رمز QR...</p>
                 </div>
                 <img id="qrImage" src="" alt="QR Code" style="display: none; max-width: 100%; border: 2px solid var(--gray-300); padding: 1rem; background: white;">
+                <div id="qrToolDetails" style="display: none; margin-top: 1rem; text-align: center;">
+                    <p id="qrToolNameField" style="margin: 0; font-weight: 600;">اسم الأداة: <span id="qrToolNameText"></span></p>
+                    <p id="qrToolCodeField" style="margin: 0.25rem 0 0; color: #4b5563;">كود الأداة: <span id="qrToolCodeText"></span></p>
+                </div>
             </div>
             <div class="modal-footer" id="qrFooter" style="display: none;">
                 <a id="qrDownload" href="" download class="btn btn-primary" style="width: 100%;">
@@ -88,7 +119,7 @@
     </div>
 
     <script>
-        function showQR(toolId, toolName) {
+        function showQR(toolId, toolName, toolCode) {
             document.getElementById('modalToolName').textContent = 'رمز QR - ' + toolName;
             document.getElementById('qrModal').classList.add('active');
             
@@ -96,6 +127,7 @@
             document.getElementById('qrLoading').style.display = 'block';
             document.getElementById('qrImage').style.display = 'none';
             document.getElementById('qrFooter').style.display = 'none';
+            document.getElementById('qrToolDetails').style.display = 'none';
             
             // Generate and load QR code
             const qrUrl = '/admin/tools/' + toolId + '/qr-show';
@@ -107,11 +139,14 @@
                 document.getElementById('qrLoading').style.display = 'none';
                 document.getElementById('qrImage').style.display = 'block';
                 document.getElementById('qrFooter').style.display = 'block';
+                document.getElementById('qrToolDetails').style.display = 'block';
             };
             img.src = qrUrl + '?t=' + new Date().getTime(); // Add timestamp to prevent cache
             
+            document.getElementById('qrToolNameText').textContent = toolName;
+            document.getElementById('qrToolCodeText').textContent = toolCode;
             document.getElementById('qrDownload').href = downloadUrl;
-            document.getElementById('qrDownload').download = 'QR_' + toolName + '.svg';
+            document.getElementById('qrDownload').download = 'QR_' + toolName + '.png';
         }
 
         function closeQRModal() {

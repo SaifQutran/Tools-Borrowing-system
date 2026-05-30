@@ -1,6 +1,10 @@
 @forelse($users as $user)
     <tr>
-        <td>{{ $user->name }}</td>
+<td>
+            {{ $user->name }} - <small style="color: var(--gray-600);">{{ $user->phone }}</small><br>
+            
+            <small style="color: var(--gray-600);">{{ $user->role == 'student' ? $user->academic_number : $user->employee_number }}</small>
+        </td>
         <td>
             @if($user->role == 'student')
                 <span class="badge badge-primary">طالب</span>
@@ -16,6 +20,9 @@
             @else
                 {{ $user->department?->name }}
             @endif
+        </td>
+        <td>
+            <livewire:increase-decrease-allowed-tools :user="$user" wire:key="allowed-tools-{{ $user->id }}" />
         </td>
         <td>
             @if($user->is_approved)

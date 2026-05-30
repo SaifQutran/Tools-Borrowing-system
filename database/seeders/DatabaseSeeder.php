@@ -51,15 +51,15 @@ class DatabaseSeeder extends Seeder
 
         // Create Tool Types
         $toolTypes = [
-            'ميكروفون' => 1,
-            'جهاز عرض' => 2,
-            'مكبر صوت' => 3,
-            'مؤشر ليزر' => 4,
-            'حاسوب محمول' => 5,
+            'ميكروفون' => [1,'Mic'],
+            'جهاز عرض' => [2,'Proj'],
+            'مكبر صوت' => [3,'Spk'],
+            'مؤشر ليزر' => [4,'Ptr'],
+            'حاسوب محمول' => [5,'Lap'],
         ];
         
-        foreach ($toolTypes as $typeName => $id) {
-            \App\Models\ToolType::create(['id' => $id, 'name' => $typeName]);
+        foreach ($toolTypes as $typeName => [$id,$shortcut]) {
+            \App\Models\ToolType::create(['id' => $id, 'name' => $typeName,'shortcut'=>$shortcut]);
         }
 
         // Create Sample Tools

@@ -17,6 +17,8 @@ return new class extends Migration
             $table->foreignId('tool_type_id')->constrained('tool_types')->onDelete('cascade');
             $table->string('code')->unique(); // Unique tool code
             $table->enum('status', ['available', 'borrowed'])->default('available');
+            $table->boolean('seen_by_std')->default(true);
+            $table->boolean('seen_by_emp')->default(true);
             $table->json('attributes')->nullable(); // Type-specific attributes (hall_number, microphone_type, specs, etc.)
             $table->string('qr_code_path')->nullable(); // Path to QR code image
             $table->timestamps();

@@ -33,11 +33,7 @@
                     @error('tool_type_id')<span style="color: var(--danger); font-size: 0.875rem;">{{ $message }}</span>@enderror
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label">كود الأداة (فريد)</label>
-                    <input type="text" name="code" class="form-control" value="{{ old('code') }}" required>
-                    @error('code')<span style="color: var(--danger); font-size: 0.875rem;">{{ $message }}</span>@enderror
-                </div>
+                
 
                 <div style="display: flex; gap: 1rem;">
                     <button type="submit" class="btn btn-primary">حفظ</button>

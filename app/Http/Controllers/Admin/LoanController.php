@@ -16,7 +16,13 @@ class LoanController extends Controller
         if ($request->has('status') && $request->status != '') {
             $query->where('status', $request->status);
         }
-
+        if ($request->has('borrowed') && $request->borrowed != '') {
+            $query->where('status', 'approved');
+        }
+        if ($request->has('pending') && $request->pending != '') {
+            $query->where('status', 'pending');
+        }
+        
         $loans = $query->paginate(20);
         
         return view('admin.loans.index', compact('loans'));

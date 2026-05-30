@@ -1,7 +1,8 @@
 @forelse($loans as $loan)
     <tr>
         <td>
-            {{ $loan->user->name }}<br>
+            {{ $loan->user->name }} - <small style="color: var(--gray-600);">{{ $loan->user->phone }}</small><br>
+            
             <small style="color: var(--gray-600);">{{ $loan->user->role == 'student' ? $loan->user->academic_number : $loan->user->employee_number }}</small>
         </td>
         <td>{{ $loan->tool->name }}</td>

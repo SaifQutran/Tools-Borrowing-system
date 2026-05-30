@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>إدارة المستخدمين</title>
     @vite(['resources/css/app.css'])
+    @livewireStyles
 </head>
 <body>
     @include('admin.nav')
@@ -55,7 +56,9 @@
                             <th>النوع</th>
                             <th>الرقم</th>
                             <th>التفاصيل</th>
+                            <th>الأدوات المسموح بها</th>
                             <th>الحالة</th>
+
                             <th>الإجراءات</th>
                         </tr>
                     </thead>
@@ -93,7 +96,16 @@
                 .then(response => response.json())
                 .then(data => {
                     // Update table body
-                    document.getElementById('usersTableBody').innerHTML = data.html;
+                    const tableBody = document.getElementById('usersTableBody');
+                    tableBody.innerHTML = data.html;
+
+                    if (window.Livewire) {
+                        if (typeof window.Livewire.rescan === 'function') {
+                            window.Livewire.rescan(tableBody);
+                        } else if (typeof window.Livewire.initTree === 'function') {
+                            window.Livewire.initTree(tableBody);
+                        }
+                    }
                     
                     // Reset indicator
                     indicator.style.opacity = '1';
@@ -106,5 +118,6 @@
                 });
         }
     </script>
+    @livewireScripts
 </body>
 </html>

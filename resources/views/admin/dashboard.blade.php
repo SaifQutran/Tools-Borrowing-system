@@ -4,25 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>لوحة التحكم - الإدارة</title>
+    
     @vite(['resources/css/app.css'])
 </head>
 <body>
-    <div class="navbar">
-        <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
-            <h2 style="color: var(--white); margin: 0;">نظام استعارة الأدوات - لوحة الإدارة</h2>
-            <div style="display: flex; gap: 1rem; align-items: center;">
-                <a href="{{ route('admin.dashboard') }}" class="nav-link">الرئيسية</a>
-                <a href="{{ route('admin.tools.index') }}" class="nav-link">الأدوات</a>
-                <a href="{{ route('admin.loans.index') }}" class="nav-link">الطلبات</a>
-                <a href="{{ route('admin.users.index') }}" class="nav-link">المستخدمين</a>
-                <a href="{{ route('admin.settings.index') }}" class="nav-link">الإعدادات</a>
-                <form method="POST" action="{{ route('logout') }}" style="display: inline;">
-                    @csrf
-                    <button type="submit" class="nav-link" style="background: none; border: none; cursor: pointer;">تسجيل الخروج</button>
-                </form>
-            </div>
-        </div>
-    </div>
+        @include('admin.nav')
+
 
     <div class="container" style="padding: 2rem 1rem;">
         <h1 class="mb-3">لوحة التحكم</h1>
@@ -32,22 +19,34 @@
         @endif
 
         <div class="grid grid-4" style="margin-bottom: 2rem;">
+                        <a href="{{ route('admin.tools.index') }}" style="text-decoration: none;">
+
             <div class="stat-card">
                 <div class="stat-number">{{ $stats['total_tools'] }}</div>
                 <div class="stat-label">إجمالي الأدوات</div>
             </div>
-            <div class="stat-card" style="background: linear-gradient(135deg, var(--secondary) 0%, var(--accent) 100%);">
-                <div class="stat-number">{{ $stats['borrowed_tools'] }}</div>
-                <div class="stat-label">أدوات مستعارة</div>
-            </div>
+        </a>
+            <a href="{{ route('admin.loans.index') }}?borrowed=0" style="text-decoration: none;">
+                
+                <div class="stat-card" style="background: linear-gradient(135deg, var(--secondary) 0%, var(--accent) 100%);">
+                    <div class="stat-number">{{ $stats['borrowed_tools'] }}</div>
+                    <div class="stat-label">أدوات مستعارة</div>
+                </div>
+            </a>
+                        <a href="{{ route('admin.loans.index') }}?pending=0" style="text-decoration: none;">
+
             <div class="stat-card" style="background: linear-gradient(135deg, var(--warning) 0%, #f97316 100%);">
                 <div class="stat-number">{{ $stats['pending_requests'] }}</div>
                 <div class="stat-label">طلبات معلقة</div>
             </div>
+            </a>
+                        <a href="{{ route('admin.users.index') }}" style="text-decoration: none;">
+
             <div class="stat-card" style="background: linear-gradient(135deg, var(--success) 0%, #059669 100%);">
                 <div class="stat-number">{{ $stats['total_users'] }}</div>
                 <div class="stat-label">إجمالي المستخدمين</div>
             </div>
+            </a>
         </div>
 
         @if($stats['pending_users'] > 0)

@@ -30,6 +30,9 @@ class LoanRequestController extends Controller
         if ($tool->status !== 'available') {
             return back()->with('error', 'هذه الأداة غير متاحة حالياً');
         }
+        if(auth()->user()->allowed_tools <= auth()->user()->loanRequests()->whereIn('status', ['pending', 'approved'])->count()) {
+            return back()->with('error', 'لقد وصلت إلى الحد الأقصى للأدوات المسموح بها. يرجى إعادة الأدوات الحالية قبل طلب أدوات جديدة.');
+        }
 
         // Check if user already has pending or active loan for this tool
         $existingLoan = LoanRequest::where('user_id', auth()->id())

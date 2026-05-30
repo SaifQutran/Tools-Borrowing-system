@@ -12,7 +12,18 @@ use App\Http\Controllers\User\LoanRequestController;
 use Illuminate\Support\Facades\Route;
 
 // Public route
+
 Route::get('/', function () {
+
+    if (auth()->check()) {
+
+        if (auth()->user()->role === 'admin') {
+            return redirect()->route('admin.dashboard');
+        }
+
+        return redirect()->route('dashboard');
+    }
+
     return redirect()->route('login');
 });
 
@@ -39,6 +50,8 @@ Route::prefix('admin')->middleware(['auth', App\Http\Middleware\AdminMiddleware:
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
     
     // Tools management
+    Route::get('tools/import-template', [AdminToolController::class, 'downloadImportTemplate'])->name('tools.import.template');
+    Route::post('tools/import', [AdminToolController::class, 'import'])->name('tools.import');
     Route::resource('tools', AdminToolController::class);
     Route::get('tools/{tool}/qr-show', [AdminToolController::class, 'showQr'])->name('tools.qr.show');
     Route::get('tools/{tool}/qr', [AdminToolController::class, 'downloadQr'])->name('tools.qr');
@@ -59,6 +72,7 @@ Route::prefix('admin')->middleware(['auth', App\Http\Middleware\AdminMiddleware:
     
     // Settings management
     Route::get('settings', [AdminSettingsController::class, 'index'])->name('settings.index');
+    Route::post('settings/{type}/import', [AdminSettingsController::class, 'import'])->name('settings.import');
     Route::post('settings/majors', [AdminSettingsController::class, 'storeMajor'])->name('settings.majors.store');
     Route::delete('settings/majors/{major}', [AdminSettingsController::class, 'deleteMajor'])->name('settings.majors.delete');
     Route::post('settings/levels', [AdminSettingsController::class, 'storeLevel'])->name('settings.levels.store');
