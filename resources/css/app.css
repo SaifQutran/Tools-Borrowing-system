@@ -12,6 +12,7 @@
     --success: #10b981;
     --warning: #f59e0b;
     --danger: #ef4444;
+    --late: #ffc7c7;
     --dark: #1e293b;
     --light: #f1f5f9;
     --white: #ffffff;
@@ -39,7 +40,9 @@ body {
     color: var(--gray-800);
     line-height: 1.6;
 }
-
+.table-late{
+    background-color: var(--late);
+}
 /* Logo Styles */
 .logo-bg-white {
     background: white;

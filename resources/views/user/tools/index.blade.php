@@ -62,13 +62,15 @@
                     <p style="color: var(--gray-600); margin-bottom: 1rem;">
                         <strong>الكود:</strong> {{ $tool->code }}
                     </p>
-                    <form method="POST" action="{{ route('loan.request') }}">
-                        @csrf
-                        <input type="hidden" name="tool_id" value="{{ $tool->id }}">
-                        <button type="submit" class="btn btn-primary" style="width: 100%;">
-                            طلب استعارة
-                        </button>
-                    </form>
+                    @auth
+                        
+                 
+                    <button type="button" onclick='openLoanRequestModal({{ $tool->id }}, @json($tool->name))' class="btn btn-primary" style="width: 100%;">
+                        طلب استعارة
+                    </button>
+                    @else
+                        <a href="{{ route('login') }}" class="nav-link">تسجيل الدخول</a>
+                    @endauth
                     <a href="{{ route('tool.show', $tool) }}" style="display: block; text-align: center; margin-top: 0.5rem; color: var(--primary); text-decoration: none;">
                         عرض التفاصيل
                     </a>
@@ -89,5 +91,7 @@
             {{ $tools->appends(['search' => request('search')])->links() }}
         </div>
     </div>
+
+    @include('user.tools.partials.loan-request-modal')
 </body>
 </html>

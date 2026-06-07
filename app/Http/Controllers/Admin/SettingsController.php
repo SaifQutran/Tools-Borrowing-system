@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\{Major, Level, Department, Hall, ToolType};
+use App\Models\{Major, Level, Department, Hall, ToolType, LoanDetailKey};
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -16,8 +16,9 @@ class SettingsController extends Controller
         $departments = Department::all();
         $halls = Hall::all();
         $toolTypes = ToolType::all();
+        $loanDetailKeys = LoanDetailKey::all();
 
-        return view('admin.settings.index', compact('majors', 'levels', 'departments', 'halls', 'toolTypes'));
+        return view('admin.settings.index', compact('majors', 'levels', 'departments', 'halls', 'toolTypes', 'loanDetailKeys'));
     }
 
     // Majors
@@ -93,6 +94,25 @@ class SettingsController extends Controller
         $toolType->delete();
         return back()->with('success', 'تم حذف نوع الأداة بنجاح');
     }
+    public function storeLoanDetailKey(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'value_type' => 'required|in:text,hall,number',
+        ]);
+
+        LoanDetailKey::create($validated);
+
+        return back()->with('success', 'تمت إضافة حقل تفاصيل الطلب بنجاح');
+    }
+
+    public function deleteLoanDetailKey(LoanDetailKey $loanDetailKey)
+    {
+        $loanDetailKey->delete();
+
+        return back()->with('success', 'تم حذف حقل تفاصيل الطلب بنجاح');
+    }
+
     public function import(Request $request, string $type)
     {
         $models = $this->importableSettingsModels();
@@ -167,6 +187,11 @@ class SettingsController extends Controller
                 $data['shortcut'] = $shortcut;
             }
 
+            if ($modelClass === LoanDetailKey::class) {
+                $valueType = trim((string) ($row[1] ?? 'text'));
+                $data['value_type'] = in_array($valueType, ['text', 'hall'], true) ? $valueType : 'text';
+            }
+
             $modelClass::create($data);
             $imported++;
         }
@@ -186,6 +211,7 @@ class SettingsController extends Controller
             'departments' => Department::class,
             'tool-types' => ToolType::class,
             'halls' => Hall::class,
+            'loan-detail-keys' => LoanDetailKey::class,
         ];
     }
 

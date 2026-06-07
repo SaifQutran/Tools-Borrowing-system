@@ -65,15 +65,18 @@
                             <th>المستخدم</th>
                             <th>الأداة</th>
                             <th>تاريخ الموافقة</th>
+                            <th>التفاصيل</th>
                             <th>الإجراءات</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($active_loans as $loan)
-                            <tr>
-                                <td>{{ $loan->user->name }}</td>
+                        <tr class="{{ $loan->approved_date->isPast() && !$loan->approved_date->isToday() ? 'table-late' : '' }}">
+                            {{-- <tr class="table-late"> --}}
+                                <td>{{ $loan->user->name }} - {{$loan->user->phone}} - ({{$loan->user->department? $loan->user->department->name : $loan->user->major->name . '-'.$loan->user->level->name}})</td>
                                 <td>{{ $loan->tool->name }}</td>
                                 <td>{{ $loan->approved_date?->format('Y-m-d H:i') }}</td>
+                                <td>@include('admin.loans.partials.details-cell', ['loan' => $loan])</td>
                                 <td>
                                     <form method="POST" action="{{ route('admin.loans.return', $loan) }}" style="display: inline;">
                                         @csrf
@@ -85,7 +88,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="4" class="text-center">لا توجد طلبات نشطة</td>
+                                <td colspan="5" class="text-center">لا توجد طلبات نشطة</td>
                             </tr>
                         @endforelse
                     </tbody>

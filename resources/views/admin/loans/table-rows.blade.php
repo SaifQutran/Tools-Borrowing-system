@@ -7,6 +7,7 @@
         </td>
         <td>{{ $loan->tool->name }}</td>
         <td>{{ $loan->request_date->format('Y-m-d H:i') }}</td>
+        <td>@include('admin.loans.partials.details-cell', ['loan' => $loan])</td>
         <td>
             @if($loan->status == 'pending')
                 <span class="badge badge-warning">قيد الانتظار</span>
@@ -39,5 +40,5 @@
         </td>
     </tr>
 @empty
-    <tr><td colspan="5" class="text-center">لا توجد طلبات</td></tr>
+    <tr><td colspan="6" class="text-center">لا توجد طلبات</td></tr>
 @endforelse

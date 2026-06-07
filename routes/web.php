@@ -52,6 +52,7 @@ Route::prefix('admin')->middleware(['auth', App\Http\Middleware\AdminMiddleware:
     // Tools management
     Route::get('tools/import-template', [AdminToolController::class, 'downloadImportTemplate'])->name('tools.import.template');
     Route::post('tools/import', [AdminToolController::class, 'import'])->name('tools.import');
+    Route::get('tools/download-all-qrs', [AdminToolController::class, 'downloadAllQrs'])->name('tools.download-all-qrs');
     Route::resource('tools', AdminToolController::class);
     Route::get('tools/{tool}/qr-show', [AdminToolController::class, 'showQr'])->name('tools.qr.show');
     Route::get('tools/{tool}/qr', [AdminToolController::class, 'downloadQr'])->name('tools.qr');
@@ -83,4 +84,6 @@ Route::prefix('admin')->middleware(['auth', App\Http\Middleware\AdminMiddleware:
     Route::delete('settings/tool-types/{toolType}', [AdminSettingsController::class, 'deleteToolType'])->name('settings.tool-types.delete');
     Route::post('settings/halls', [AdminSettingsController::class, 'storeHall'])->name('settings.halls.store');
     Route::delete('settings/halls/{hall}', [AdminSettingsController::class, 'deleteHall'])->name('settings.halls.delete');
+    Route::post('settings/loan-detail-keys', [AdminSettingsController::class, 'storeLoanDetailKey'])->name('settings.loan-detail-keys.store');
+    Route::delete('settings/loan-detail-keys/{loanDetailKey}', [AdminSettingsController::class, 'deleteLoanDetailKey'])->name('settings.loan-detail-keys.delete');
 });

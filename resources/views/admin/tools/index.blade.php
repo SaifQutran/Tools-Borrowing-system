@@ -62,8 +62,10 @@
                                 <td>
                                     @if($tool->status == 'available')
                                         <span class="badge badge-success">متاح</span>
-                                    @else
+                                    @elseif($tool->status == 'borrowed')
                                         <span class="badge badge-danger">مستعار</span>
+                                    @else
+                                        <span class="badge badge-warning">تم طلبها</span>
                                     @endif
                                 </td>
                                 <td>
@@ -90,6 +92,7 @@
             <input type="file" name="tools_file" accept=".xlsx,.csv" required class="form-control" style="max-width: 260px;">
             <button type="submit" class="btn btn-secondary">استيراد Excel</button>
             <a href="{{ route('admin.tools.import.template') }}" class="btn btn-primary">قالب excel</a>
+            <a href="{{ route('admin.tools.download-all-qrs') }}"  style="margin-right: 20px" class="btn btn-primary">تحميل جميع رموز QR</a>
         </form>
     </div>
     <!-- QR Code Modal -->

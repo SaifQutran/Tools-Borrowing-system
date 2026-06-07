@@ -2,7 +2,7 @@
     <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
         <div style="display: flex; align-items: center; gap: 1rem;">
             <img  src="{{ asset('storage/logo.png') }}" alt="Logo" class="logo-bg-white" style="height: 50px; width: auto;">
-            <h2 style="color: var(--white); margin: 0;">نظام استعارة الأدوات - لوحة الإدارة</h2>
+            <h3 style="color: var(--white); margin: 0;">نظام استعارة الأدوات - لوحة الإدارة</h3>
         </div>
         <div style="display: flex; gap: 1rem; align-items: center;">
             <a href="{{ route('admin.dashboard') }}" class="nav-link">الرئيسية</a>

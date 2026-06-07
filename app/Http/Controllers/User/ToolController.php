@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Models\Hall;
+use App\Models\LoanDetailKey;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Tool;
 use App\Models\ToolType;
 
@@ -10,7 +13,10 @@ class ToolController extends Controller
 {
     public function index()
     {
+        
+        $whoWillSee = Auth::user()->role == 'student' ? "seen_by_std": "seen_by_emp";
         $query = Tool::with('toolType')
+            ->where($whoWillSee,true)
             ->where('status', 'available')
             ->whereDoesntHave('loanRequests', function($q) {
                 $q->where('status', 'pending');
@@ -28,12 +34,18 @@ class ToolController extends Controller
         $tools = $query->latest()->paginate(12);
         $toolTypes = ToolType::all();
 
-        return view('user.tools.index', compact('tools', 'toolTypes'));
+        $loanDetailKeys = LoanDetailKey::all();
+        $halls = Hall::all();
+
+        return view('user.tools.index', compact('tools', 'toolTypes', 'loanDetailKeys', 'halls'));
     }
 
     public function show(Tool $tool)
     {
         $tool->load('toolType');
-        return view('user.tools.show', compact('tool'));
+        $loanDetailKeys = LoanDetailKey::all();
+        $halls = Hall::all();
+
+        return view('user.tools.show', compact('tool', 'loanDetailKeys', 'halls'));
     }
 }

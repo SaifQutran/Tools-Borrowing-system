@@ -15,6 +15,7 @@
                     <a href="{{ route('dashboard') }}" class="nav-link">العودة للوحة التحكم</a>
                     <form method="POST" action="{{ route('logout') }}" style="display: inline;">
                         @csrf
+
                         <button type="submit" class="nav-link" style="background: none; border: none; cursor: pointer;">تسجيل الخروج</button>
                     </form>
                 </div>
@@ -64,17 +65,19 @@
             @endif
 
             @auth
-                @if($tool->status == 'available')
-                    <form method="POST" action="{{ route('loan.request') }}" class="mt-3">
-                        @csrf
-                        <input type="hidden" name="tool_id" value="{{ $tool->id }}">
-                        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1rem; font-size: 1.1rem;">
+                @if((Auth::user()->role == "student" && $tool->seen_by_std == true) || (Auth::user()->role == "employee" && $tool->seen_by_emp == true))
+                    @if($tool->status == 'available') 
+                        <button type="button" onclick='openLoanRequestModal({{ $tool->id }}, @json($tool->name))' class="btn btn-primary mt-3" style="width: 100%; padding: 1rem; font-size: 1.1rem;">
                             طلب استعارة هذه الأداة
                         </button>
-                    </form>
+                    @else
+                        <div class="alert alert-error mt-3">
+                            هذه الأداة غير متاحة حالياً (مستعارة)
+                        </div>
+                     @endif
                 @else
-                    <div class="alert alert-error mt-3">
-                        هذه الأداة غير متاحة حالياً (مستعارة)
+                    <div class="alert alert-error mt-3" style="font-weight: bold;">
+                         لا يمكن طلب استعارة هذه الأداة {{ Auth::user()->role == "student" ? 'من قبل الطلاب' : 'من قبل الموظفين' }} 
                     </div>
                 @endif
             @else
@@ -84,5 +87,7 @@
             @endauth
         </div>
     </div>
+
+    @include('user.tools.partials.loan-request-modal')
 </body>
 </html>

@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use SimpleSoftwareIO\QrCode\Generator;
+use Illuminate\Support\Facades\Storage;
 
 class ToolController extends Controller
 {
@@ -167,31 +168,85 @@ class ToolController extends Controller
         $tool->delete();
         return redirect()->route('admin.tools.index')->with('success', 'تم حذف الأداة بنجاح');
     }
-
     public function downloadQr(Tool $tool)
     {
-        $this->generateQRCode($tool);
-        $path = storage_path('app/public/' . $tool->qr_code_path);
+        if (
+            ! $tool->qr_code_path ||
+            ! Storage::disk('public')->exists($tool->qr_code_path)
+        ) {
+            $this->generateQRCode($tool);
+            $tool->refresh();
+        }
 
-        return response()->streamDownload(function () use ($path) {
-            readfile($path);
-        }, 'QR_' . $tool->name . '.png', [
-            'Content-Type' => 'image/png',
-        ]);
+        return Storage::disk('public')->download(
+            $tool->qr_code_path,
+            'QR_' . $tool->code . '.png'
+        );
+    }
+
+    public function downloadAllQrs()
+    {
+        if (! class_exists(\ZipArchive::class)) {
+            return back()->withErrors(['qr_codes' => 'The ZipArchive PHP extension is required to download all QR codes.']);
+        }
+
+        $tools = Tool::orderBy('code')->get();
+
+        if ($tools->isEmpty()) {
+            return back()->withErrors(['qr_codes' => 'No tools found to download QR codes.']);
+        }
+
+        $zipPath = storage_path('app/tool_qr_codes_' . uniqid() . '.zip');
+        $zip = new \ZipArchive();
+
+        if ($zip->open($zipPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) !== true) {
+            return back()->withErrors(['qr_codes' => 'Unable to create the QR codes archive.']);
+        }
+
+        foreach ($tools as $tool) {
+            if (
+                ! $tool->qr_code_path ||
+                ! Storage::disk('public')->exists($tool->qr_code_path)
+            ) {
+                $this->generateQRCode($tool);
+                $tool->refresh();
+            }
+
+            $filePath = Storage::disk('public')->path($tool->qr_code_path);
+            $fileName = Str::slug($tool->name ?: $tool->code ?: 'tool-' . $tool->id);
+            $fileName = $fileName !== '' ? $fileName : 'tool-' . $tool->id;
+
+            $zip->addFile($filePath, 'QR_' . $fileName . '.png');
+        }
+
+        $zip->close();
+
+        return response()
+            ->download($zipPath, 'tool_qr_codes.zip', ['Content-Type' => 'application/zip'])
+            ->deleteFileAfterSend(true);
     }
 
     public function showQr(Tool $tool)
     {
+        if (
+            $tool->qr_code_path &&
+            Storage::disk('public')->exists($tool->qr_code_path)
+        ) {
+            return response()->file(Storage::disk('public')->path($tool->qr_code_path));
+        }
+
         $this->generateQRCode($tool);
-        
-        $path = storage_path('app/public/' . $tool->qr_code_path);
-        
-        if (file_exists($path)) {
-            return response()->file($path, [
+        $tool->refresh();
+
+        if (
+            $tool->qr_code_path &&
+            Storage::disk('public')->exists($tool->qr_code_path)
+        ) {
+            return response()->file(Storage::disk('public')->path($tool->qr_code_path), [
                 'Content-Type' => 'image/png',
             ]);
         }
-        
+
         abort(404);
     }
 

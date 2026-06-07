@@ -187,6 +187,44 @@
                     @endforeach
                 </ul>
             </div>
+
+            <!-- Loan Detail Keys -->
+            <div class="card">
+                <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem;">
+                    <span>حقول تفاصيل الطلب</span>
+                    <form method="POST" action="{{ route('admin.settings.import', 'loan-detail-keys') }}" enctype="multipart/form-data">
+                        @csrf
+                        <label class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.875rem; cursor: pointer;">
+                            استيراد Excel
+                            <input type="file" name="settings_file" accept=".xlsx,.csv" required style="display: none;" onchange="this.form.submit()">
+                        </label>
+                    </form>
+                </div>
+                <form method="POST" action="{{ route('admin.settings.loan-detail-keys.store') }}" class="mb-3">
+                    @csrf
+                    <div style="display: flex; gap: 0.5rem;">
+                        <input type="text" name="name" class="form-control" placeholder="إضافة حقل جديد" required>
+                        <select name="value_type" class="form-control" required style="max-width: 140px;">
+                            <option value="text">نص</option>
+                            <option value="number">رقم</option>
+                            <option value="hall">قاعة</option>
+                        </select>
+                        <button type="submit" class="btn btn-primary">إضافة</button>
+                    </div>
+                </form>
+                <ul style="list-style: none; padding: 0; max-height: 11rem; overflow-y: auto;">
+                    @foreach($loanDetailKeys as $key)
+                        <li style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem; border-bottom: 1px solid var(--gray-200);">
+                            <span>{{ $key->name }} - {{ $key->value_type === 'hall' ? 'قاعة' : 'نص' }}</span>
+                            <form method="POST" action="{{ route('admin.settings.loan-detail-keys.delete', $key) }}">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger" style="padding: 0.25rem 0.75rem; font-size: 0.875rem;">حذف</button>
+                            </form>
+                        </li>
+                    @endforeach
+                </ul>
+            </div>
         </div>
     </div>
 </body>

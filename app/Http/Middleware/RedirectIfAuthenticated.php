@@ -10,6 +10,7 @@ class RedirectIfAuthenticated
 {
     public function handle(Request $request, Closure $next, string ...$guards): Response
     {
+
         if (auth()->check()) {
 
             if (auth()->user()->role === 'admin') {
